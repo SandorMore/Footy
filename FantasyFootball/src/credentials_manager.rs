@@ -58,3 +58,33 @@ pub async fn verify_password(pwd: &str, hash: &str) -> Result<bool, argon2::pass
     let parse_hash = argon2::PasswordHash::new(hash)?;
     Ok(Argon2::default().verify_password(pwd.as_bytes(), &parse_hash).is_ok())
 }
+
+//unit tests
+#[cfg(test)]
+mod tests 
+{
+    use super::*;
+    
+    #[tokio::test]
+    async fn password_hash_can_be_verified() {
+        let hash = password_hash("secret").await.unwrap();
+
+        assert!(verify_password("secret", &hash).await.unwrap());
+        assert!(!verify_password("wrong", &hash).await.unwrap());
+    }
+
+    #[tokio::test]
+    async fn token_round_trip_works() {
+        let token = create_token("test-secret", "42").await.unwrap();
+        let claims = verify_token(&token, "test-secret").await.unwrap();
+
+        assert_eq!(claims.sub, "42");
+    }
+
+    #[tokio::test]
+    async fn token_with_wrong_secret_fails() {
+        let token = create_token("test-secret", "42").await.unwrap();
+
+        assert!(verify_token(&token, "wrong-secret").await.is_err());
+    }
+}
