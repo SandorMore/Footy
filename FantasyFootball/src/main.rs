@@ -1,4 +1,4 @@
-use rocket;
+#[macro_use] extern crate rocket;
 
 pub mod credentials_manager;
 

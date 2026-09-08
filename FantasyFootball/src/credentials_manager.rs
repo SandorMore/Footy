@@ -6,24 +6,24 @@ use argon2::{
 
 #[allow(unused)]
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
-use serede::{Serialize, Deserialize};
+use serde::{Serialize, Deserialize};
 
     
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Claims 
 {
     pub sub: String,
-    pub exp: usize
+    pub exp: i64
 }
     
 pub fn create_token(secret: &str, user_id: &str) -> Result<String, jsonwebtoken::errors::Error>
 {
     let claims = Claims {
         sub: user_id.to_string(),
-        exp: 999999999
+        exp: chrono::Utc::now().timestamp() + (3600 * 2)
     };
 
-    encode(&Header::default(), &claims, &EncodingKey::from_secret(secret.to_string()))
+    encode(&Header::default(), &claims, &EncodingKey::from_secret(secret.as_ref()))
 }
 
 pub fn verify_token(token: &str, secret: &str) -> Result<Claims, jsonwebtoken::errors::Error>
