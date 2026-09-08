@@ -16,7 +16,7 @@ pub struct Claims
     pub exp: i64
 }
     
-pub fn create_token(secret: &str, user_id: &str) -> Result<String, jsonwebtoken::errors::Error>
+pub async fn create_token(secret: &str, user_id: &str) -> Result<String, jsonwebtoken::errors::Error>
 {
     let claims = Claims {
         sub: user_id.to_string(),
@@ -26,7 +26,7 @@ pub fn create_token(secret: &str, user_id: &str) -> Result<String, jsonwebtoken:
     encode(&Header::default(), &claims, &EncodingKey::from_secret(secret.as_ref()))
 }
 
-pub fn verify_token(token: &str, secret: &str) -> Result<Claims, jsonwebtoken::errors::Error>
+pub async fn verify_token(token: &str, secret: &str) -> Result<Claims, jsonwebtoken::errors::Error>
 {
     let token_data = decode::<Claims>(
         token,
