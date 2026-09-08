@@ -1,17 +1,17 @@
-#[allow(unused)]
-#[macro_use] extern crate rocket;
+use rocket;
 
-#[get("/hello")]
-fn hello() -> &'static str
+pub mod credentials_manager;
+
+#[get("/players")]
+fn retrieve_players() -> &'static str
 {
-    "hello"
+    "players"
 }
-
 
 #[rocket::main]
 async fn main() {
     let _ = rocket::build()
-        .mount("/", routes![hello])
+        .mount("/", routes![retrieve_players])
         .launch()
         .await;
 }
