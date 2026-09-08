@@ -1,3 +1,4 @@
+use argon2::PasswordVerifier;
 #[allow(unused)]
 use argon2::{
     password_hash::{rand_core::OsRng, PasswordHasher, SaltString},
@@ -7,7 +8,6 @@ use argon2::{
 #[allow(unused)]
 use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation};
 use serde::{Serialize, Deserialize};
-
     
 #[derive(Serialize, Deserialize, Debug)]
 pub struct Claims 
@@ -16,6 +16,15 @@ pub struct Claims
     pub exp: i64
 }
     
+pub struct RefreshToken 
+{
+    pub token_hash: String,
+    pub user_id: String,
+    pub expires_at: i64,
+    pub revoked: bool
+
+}
+
 pub async fn create_token(secret: &str, user_id: &str) -> Result<String, jsonwebtoken::errors::Error>
 {
     let claims = Claims {
@@ -42,4 +51,10 @@ pub async fn password_hash(pwd: &str) -> Result<String, argon2::password_hash::E
     let salt = SaltString::generate(&mut OsRng);
     
     Ok(Argon2::default().hash_password(pwd.as_bytes(), &salt)?.to_string())
+}
+
+pub async fn verify_password(pwd: &str, hash: &str) -> Result<bool, argon2::password_hash::errors::Error> 
+{
+    let parse_hash = argon2::PasswordHash::new(hash)?;
+    Ok(Argon2::default().verify_password(pwd.as_bytes(), &parse_hash).is_ok())
 }
