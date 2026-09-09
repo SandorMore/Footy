@@ -7,6 +7,7 @@ use serde::Deserialize;
 use crate::credentials_manager::{create_token, password_hash, verify_password, Claims};
 use crate::database_manager::{create_user, find_user_by_username};
 use crate::AppConfig;
+use crate::username_validator::{validate_username};
 
 #[derive(Deserialize)]
 pub struct AuthRequest {
@@ -49,6 +50,12 @@ pub async fn login(req: Json<AuthRequest>, config: &State<AppConfig>, jar: &Cook
 }
 
 #[get("/players")]
-pub fn retrieve_players(claims: Claims) -> String {
+pub async fn retrieve_players(claims: Claims) -> String {
     format!("players — hello user {}", claims.sub)
 }
+
+#[get("/")]
+pub async fn startup_page() -> &'static str
+{
+    "hello"
+} 

@@ -36,6 +36,7 @@ async fn main() {
             routes::register,
             routes::login,
             routes::retrieve_players,
+            routes::startup_page
         ])
         .launch()
         .await;
